@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 游戏竞品追踪看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('bg.jpg') center center / cover no-repeat fixed;
+            min-height: 100vh;
+            color: #fff;
+        }
+        .logo-badge {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            z-index: 1000;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .update-time { color: #888; font-size: 0.9em; }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .game-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .game-card.locke { border-top: 4px solid #ff6b6b; }
+        .game-card.palworld { border-top: 4px solid #4ecdc4; }
+        .game-card.pokemon { border-top: 4px solid #ffd93d; }
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .game-title { font-size: 1.5em; font-weight: bold; }
+        .game-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            background: rgba(255,255,255,0.1);
+        }
+        .game-card.locke .game-badge { background: rgba(255,107,107,0.2); color: #ff6b6b; }
+        .game-card.palworld .game-badge { background: rgba(78,205,196,0.2); color: #4ecdc4; }
+        .game-card.pokemon .game-badge { background: rgba(255,217,61,0.2); color: #ffd93d; }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title .icon { font-size: 1.1em; }
+        .news-list, .ugc-list, .social-list { list-style: none; }
+        .news-list li, .ugc-list li, .social-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .news-list li:last-child, .ugc-list li:last-child, .social-list li:last-child { border-bottom: none; }
+        .news-list a, .ugc-list a, .social-list a {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            transition: color 0.2s;
+        }
+        .news-list a:hover, .ugc-list a:hover, .social-list a:hover { color: #00d4ff; }
+        .news-title, .ugc-title, .social-title { flex: 1; font-size: 0.95em; line-height: 1.4; }
+        .news-time, .ugc-time, .social-time { 
+            font-size: 0.8em; 
+            color: #666; 
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 2em; font-weight: bold; color: #00d4ff; }
+        .stat-label { font-size: 0.85em; color: #888; margin-top: 5px; }
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.85em;
+        }
+        .highlight { background: rgba(255,107,107,0.2); padding: 2px 6px; border-radius: 4px; }
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .images-grid img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
+        @media (max-width: 768px) {
+            .games-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.8em; }
+            .stats-bar { flex-wrap: wrap; gap: 20px; }
+        }
+        .auto-refresh {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,212,255,0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.85em;
+            color: #00d4ff;
+            border: 1px solid rgba(0,212,255,0.3);
+        }
+        .priority-tag {
+            display: inline-block;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            background: #ff6b6b;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .hot-tag {
+            display: inline-block;
+            font-size: 0.65em;
+            padding: 2px 5px;
+            background: #ffd93d;
+            color: #1a1a2e;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .platform-tag {
+            display: inline-block;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            background: rgba(0,212,255,0.2);
+            color: #00d4ff;
+            border-radius: 4px;
+            margin-right: 6px;
+        }
+        .ugc-title-wrapper {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .xiaohongshu-tag {
+            display: inline-block;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            background: rgba(255,0,0,0.2);
+            color: #ff6b6b;
+            border-radius: 4px;
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-badge">🚀 smo104group18</div>
+    <div class="container">
+        <header class="header">
+            <h1>🎮 游戏竞品追踪看板</h1>
+            <p class="update-time">最后更新：2026-04-16 10:30 | <span class="highlight">重点追踪《洛克王国世界》</span></p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">18</div>
+                <div class="stat-label">新闻资讯</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">14</div>
+                <div class="stat-label">攻略/UGC</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">3</div>
+                <div class="stat-label">追踪游戏</div>
+            </div>
+        </div>
+
+        <div class="games-grid">
+            <!-- 洛克王国世界 - C位展示 -->
+            <div class="game-card locke">
+                <div class="game-header">
+                    <h2 class="game-title">🔥 洛克王国世界</h2>
+                    <span class="game-badge">⭐ 重点追踪</span>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title"><span class="icon">📰</span> 最新资讯</h3>
+                    <ul class="news-list">
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <span class="news-title">清明节精灵表情包狂欢！三小只/迪莫/恶魔叮等稀有精灵图鉴<span class="hot-tag">🔥HOT</span><span class="priority-tag">NEW</span></span>
+                                <span class="news-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://m.toutiao.com/group/7626740737497154063/" target="_blank">
+                                <span class="news-title">异色精灵全解析！收藏党终极获取指南（S1赛季18只异色）<span class="priority-tag">NEW</span></span>
+                                <span class="news-time">04-09</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <span class="news-title">皮卡月刊「晚安睡衣派对」4月10日上新！软萌温馨派对<span class="priority-tag">NEW</span></span>
+                                <span class="news-time">04-10</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <span class="news-title">布达佩斯交响乐团演绎《洛克王国：世界》王国城堡BGM<span class="priority-tag">NEW</span></span>
+                                <span class="news-time">04-10</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://m.toutiao.com/group/7628415306804822562/" target="_blank">
+                                <span class="news-title">3000万小洛克重返卡洛西亚，不逼氪改写开放世界规则</span>
+                                <span class="news-time">04-14</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://m.toutiao.com/group/7628566151882113590/" target="_blank">
+                                <span class="news-title">4.16更新白送两个异色蛋，咕噜球直接白菜价!</span>
+                                <span class="news-time">04-14</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://pd.qq.com/g/roco135790/text/1281035" target="_blank">
+                                <span class="news-title">王国安全部打击外挂：4450名违规账号被处罚</span>
+                                <span class="news-time">04-15</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title"><span class="icon">💬</span> UGC内容（小红书）<span class="priority-tag">NEW</span></h3>
+                    <ul class="ugc-list">
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@念哥不是念子：火花/水蓝蓝/喵喵 表情包系列</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@精神一键归零：精灵表情包大合集</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@梨茉：水蓝蓝举起对的牌子表情包</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@泥里籽AliyaKI：迪莫表情包系列</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@目成：恶魔叮表情包，可爱又灵动</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@发病大号：喵喵小鼻噶表情包</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@烯色虹光：绒光优优表情包</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@痛痛飞走噜：帽兜娃娃表情包</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@番茄与西红柿：鸭吉吉拽拽表情包</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://k.sina.cn/article_5952915705_162d248f906702q9lg.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="xiaohongshu-tag">小红书</span>
+                                    <span class="ugc-title">@酒巷：可立鸡/晕晕鸡神秘咒语音效表情包</span>
+                                </div>
+                                <span class="ugc-time">04-07</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title"><span class="icon">📖</span> 攻略内容</h3>
+                    <ul class="ugc-list">
+                        <li>
+                            <a href="https://www.taptap.cn/moment/786567056207120843" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="platform-tag">TapTap</span>
+                                    <span class="ugc-title">高阶攻略大全：T0阵容风起队与毒系持续队详解</span>
+                                </div>
+                                <span class="ugc-time">03-27</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://m.toutiao.com/group/7621891954976113152/" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="platform-tag">抖音</span>
+                                    <span class="ugc-title">异色炫彩精灵全解析！收藏党终极获取指南</span>
+                                </div>
+                                <span class="ugc-time">03-27</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://app.ali213.net/gl/1758035.html" target="_blank">
+                                <div class="ugc-title-wrapper">
+                                    <span class="platform-tag">游侠</span>
+                                    <span class="ugc-title">新手开荒攻略：御三家选择与速刷升级路线</span>
+                                </div>
+                                <span class="ugc-time">03-27</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title"><span class="icon">🖼️</span> 游戏图片</h3>
+                    <div class="images-grid">
+                        <img src="https://game.gtimg.cn/images/rocom/web202504/logo2.png" alt="洛克王国世界官方Logo" loading="lazy">
+                        <img src="https://game.gtimg.cn/images/rocom/web202504/index/part1/bg.jpg" alt="洛克王国世界宣传图" loading="lazy">
+                        <img src="https://k.sinaimg.cn/n/spider20260407/560/w1080h1080/20260407/bb58-b76bfd86227bdb5379165b8eb44bc89a.jpg/w700d1q75cms.jpg" alt="火花表情包" loading="lazy">
+                        <img src="https://k.sinaimg.cn/n/spider20260407/560/w1080h1080/20260407/6e64-abf56b10fefc1828bb4bc205556841eb.jpg/w700d1q75cms.jpg" alt="水蓝蓝表情包" loading="lazy">
+                        <img src="https://sf3-ttcdn-tos.pstatp.com/img/tos-cn-i-6w9my0ksvp/36447fffc59d448b886f523741a4ed7c~cs.jpeg" alt="异色精灵收藏" loading="lazy">
+                        <img src="https://sf3-ttcdn-tos.pstatp.com/img/tos-cn-i-6w9my0ksvp/3184e3880aa247dca3cb1b0dc4fb8acf~cs.jpeg" alt="异色炫彩精灵" loading="lazy">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 幻兽帕鲁 -->
+            <div class="game-card palworld">
+                <div class="game-header">
+                    <h2 class="game-title">🦑 幻兽帕鲁</h2>
+                    <span class="game-badge">竞品参考</span>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title"><span class="icon">📰</span> 最新资讯</h3>
+                    <ul class="news-list">
+                        <li>
+                            <a href="http://www.ali213.net/news/html/2026-4/1006605.html" target="_blank">
+                                <span class="news-title">《幻兽帕鲁》1.0版仍在开发，临近完成将有预告<span class="priority-tag">NEW</span></span>
+                                <span class="news-time">04-14</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://worldofgeek.fr/palworld-version-1-0-nouveautes/" target="_blank">
+                                <span class="news-title">Pocketpair确认1.0版2026年发布，结束抢先体验时代</span>
+                                <span class="news-time">03-24</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://m.toutiao.com/group/7617897265311384073/" target="_blank">
+                                <span class="news-title">GDC 2026重磅！1.0内容规模大到"令人震惊"，建议删档重玩<span class="hot-tag">🔥HOT</span></span>
+                                <span class="news-time">03-17</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.ali213.net/news/html/2026-1/994951.html" target="_blank">
+                                <span class="news-title">五只新帕鲁亮相！莲花龙/电气狮子/拔刀鱼 2026年登场</span>
+                                <span class="news-time">01-20</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.ashleyweaverauthor.com/palworld-feybreak-patch-notes-new-pals-weapons-locations-and-more.html" target="_blank">
+                                <span class="news-title">Palworld Feybreak更新：新帕鲁、武器、地点等</span>
+                                <span class="news-time">04-05</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title"><span class="icon">📊</span> 关键数据</h3>
+                    <ul class="social-list">
+                        <li>
+                            <a href="https://worldofgeek.fr/palworld-version-1-0-nouveautes/" target="_blank">
+                                <span class="social-title">2024年销量1500万+，Steam好评率92%，在线峰值210万+</span>
+                                <span class="social-time">年度</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://worldofgeek.fr/palworld-version-1-0-nouveautes/" target="_blank">
+                                <span class="social-title">法国玩家占12%，2026年预计达380万玩家</span>
+                                <span class="social-time">预测</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://m.toutiao.com/group/7617897265311384073/" target="_blank">
+                                <span class="social-title">1.0版新增：世界树区域、近战系统、建造革新、ULTRAKILL联动</span>
+                                <span class="social-time">待定</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 宝可梦 -->
+            <div class="game-card pokemon">
+                <div class="game-header">
+                    <h2 class="game-title">⚡ 宝可梦</h2>
+                    <span class="game-badge">竞品参考</span>
+                </div>
+                
+                <div class="section">
+                    <h3 class="section-title"><span class="icon">📰</span> 最新资讯</h3>
+                    <ul class="news-list">
+                        <li>
+                            <a href="https://wap.gamersky.com/news/Content-2120396.html" target="_blank">
+                                <span class="news-title">《宝可梦冠军》正式上线NS，集结历代规则爆燃开打<span class="priority-tag">NEW</span></span>
+                                <span class="news-time">04-08</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://m.toutiao.com/group/7627865541222433321/" target="_blank">
+                                <span class="news-title">2026官方卡牌道馆杯4月25日全国8城同步开赛</span>
+                                <span class="news-time">04-12</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://pokemon.gamespress.com/nl/Pokemon-Champions-is-nu-beschikbaar-29966" target="_blank">
+                                <span class="news-title">Pokemon Champions发布：太晶化与Mega进化首次同时登场</span>
+                                <span class="news-time">04-08</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://pokemon.gamespress.com/pt" target="_blank">
+                                <span class="social-title">Pokemon TCG Mega Evolution Perfect Order卡牌发布</span>
+                                <span class="social-time">03-27</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title"><span class="icon">📊</span> 关键数据</h3>
+                    <ul class="social-list">
+                        <li>
+                            <a href="https://wap.gamersky.com/news/Content-2120396.html" target="_blank">
+                                <span class="social-title">《宝可梦冠军》Nintendo Switch独占，太晶化+Mega进化同台</span>
+                                <span class="social-time">04-08</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="http://m.toutiao.com/group/7627865541222433321/" target="_blank">
+                                <span class="social-title">卡牌道馆杯覆盖北京/上海/广州/深圳/成都/武汉/西安/杭州</span>
+                                <span class="social-time">04-25</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>数据来源：新浪微博、小红书、抖音精选、TapTap、17173、游侠网等 | 自动更新中</p>
+            <p style="margin-top:8px;color:#555;">🎮 游戏竞品看板 | 重点追踪《洛克王国世界》 | 2026-04-16</p>
+        </footer>
+    </div>
+
+    <div class="auto-refresh">
+        🔄 自动刷新中
+    </div>
+
+    <script>
+        // 自动刷新页面（每小时一次）
+        setTimeout(function(){
+            location.reload();
+        }, 3600000);
+    </script>
+</body>
+</html>

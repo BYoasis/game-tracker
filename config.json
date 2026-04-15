@@ -1,0 +1,67 @@
+{
+  "project_name": "游戏竞品追踪看板",
+  "update_interval": "hourly",
+  "games": [
+    {
+      "name": "洛克王国世界",
+      "name_en": "Roco Kingdom World",
+      "keywords": ["洛克王国世界", "洛克王国", "Roco Kingdom"],
+      "sources": {
+        "news": [
+          {"type": "search", "query": "洛克王国世界 官方公告 新闻", "platform": "web"},
+          {"type": "search", "query": "洛克王国世界 更新 版本", "platform": "web"}
+        ],
+        "ugc": [
+          {"type": "search", "query": "洛克王国世界 攻略", "platform": "web"},
+          {"type": "search", "query": "洛克王国世界 二创", "platform": "web"}
+        ],
+        "social": [
+          {"type": "search", "query": "洛克王国世界 微博", "platform": "web"},
+          {"type": "search", "query": "洛克王国世界 B站", "platform": "web"}
+        ]
+      }
+    },
+    {
+      "name": "幻兽帕鲁",
+      "name_en": "Palworld",
+      "keywords": ["幻兽帕鲁", "Palworld", "帕鲁"],
+      "sources": {
+        "news": [
+          {"type": "search", "query": "幻兽帕鲁 Palworld 更新 新闻", "platform": "web"},
+          {"type": "search", "query": "Pocketpair Palworld update", "platform": "web"}
+        ],
+        "ugc": [
+          {"type": "search", "query": "幻兽帕鲁 攻略", "platform": "web"},
+          {"type": "search", "query": "Palworld guide tips", "platform": "web"}
+        ],
+        "social": [
+          {"type": "search", "query": "幻兽帕鲁 B站", "platform": "web"},
+          {"type": "search", "query": "Palworld Reddit", "platform": "web"}
+        ]
+      }
+    },
+    {
+      "name": "宝可梦",
+      "name_en": "Pokemon",
+      "keywords": ["宝可梦", "Pokemon", "宝可梦朱紫", "Pokemon GO"],
+      "sources": {
+        "news": [
+          {"type": "rss", "url": "https://pokemondb.net/news/feed"},
+          {"type": "search", "query": "宝可梦 新闻 最新", "platform": "web"}
+        ],
+        "ugc": [
+          {"type": "search", "query": "宝可梦 攻略", "platform": "web"},
+          {"type": "search", "query": "Pokemon guide", "platform": "web"}
+        ],
+        "social": [
+          {"type": "search", "query": "宝可梦 微博", "platform": "web"},
+          {"type": "search", "query": "Pokemon B站", "platform": "web"}
+        ]
+      }
+    }
+  ],
+  "output": {
+    "dashboard_path": "./游戏竞品看板/dashboard.html",
+    "data_path": "./游戏竞品看板/data/latest.json"
+  }
+}
