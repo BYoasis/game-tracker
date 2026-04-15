@@ -609,6 +609,29 @@
                 stat2: '热门攻略点赞',
                 stat3: '下版本更新',
                 stat4: '官号粉丝',
+                // 首页游戏卡片
+                gameLocke: '🔥 洛克王国世界',
+                gameLockeBadge: '⭐ 重点追踪',
+                gamePalworld: '🦎 幻兽帕鲁',
+                gamePokemon: '⚡ 宝可梦',
+                competitorBadge: '竞品',
+                latestNews: '最新资讯',
+                ugcSection: 'UGC内容（小红书真实采集）',
+                xiaohongshuTag: '小红书',
+                // 首页新闻列表
+                homeNews1: '3000万小洛克重返卡洛西亚',
+                homeNews2: '4.16更新白送两个异色蛋！',
+                homeNews3: '官方致信回应体验痛点',
+                homeNews4: '打击外挂：4450账号处罚',
+                homeUgc1: '@攻略站：新手开服必抓榜 🔥3.3万赞',
+                homeUgc2: '@小鱼玩游戏：萌新保姆级攻略 🔥2.6万赞',
+                homeUgc3: '@清玖：棱镜球使用推荐榜 🔥2.6万赞',
+                // 幻兽帕鲁首页新闻
+                palNews1: '1.0版仍在开发，临近完成',
+                palNews2: '2026年结束抢先体验',
+                // 宝可梦首页新闻
+                pokeNews1: '《宝可梦冠军》正式上线NS',
+                pokeNews2: '道馆杯4月25日8城开赛',
                 // 新闻卡片
                 news1Title: '致小洛克的一封信：4.16补偿公告',
                 news1Desc: '官方回应体验痛点，4月16日发放异色双灯鱼蛋+自选异色精灵蛋...',
@@ -666,6 +689,29 @@
                 stat2: 'Top Guide Likes',
                 stat3: 'Next Update',
                 stat4: 'Official Followers',
+                // 首页游戏卡片
+                gameLocke: '🔥 Rock Kingdom World',
+                gameLockeBadge: '⭐ Featured',
+                gamePalworld: '🦎 Palworld',
+                gamePokemon: '⚡ Pokémon',
+                competitorBadge: 'Competitor',
+                latestNews: 'Latest News',
+                ugcSection: 'UGC Content (Xiaohongshu)',
+                xiaohongshuTag: 'Xiaohongshu',
+                // 首页新闻列表
+                homeNews1: '30M Little Locks Return to Carlos',
+                homeNews2: '4.16 Update: Free Rare Eggs!',
+                homeNews3: 'Official Letter on Experience Issues',
+                homeNews4: 'Anti-cheat: 4450 Accounts Banned',
+                homeUgc1: '@GuideStation: Starter Must-Catch List 🔥33K',
+                homeUgc2: '@XiaoYu: Complete Beginner Guide 🔥26K',
+                homeUgc3: '@QingJiu: Prism Ball Recommendations 🔥26K',
+                // 幻兽帕鲁首页新闻
+                palNews1: 'v1.0 Still in Development, Near Completion',
+                palNews2: 'Early Access Ending in 2026',
+                // 宝可梦首页新闻
+                pokeNews1: 'Pokémon Champions Released on NS',
+                pokeNews2: 'Gym Cup Starts April 25 in 8 Cities',
                 // 新闻卡片
                 news1Title: 'Letter to Little Locks: 4.16 Compensation',
                 news1Desc: 'Official response to experience issues, giving away rare eggs on April 16...',
@@ -733,6 +779,73 @@
             statLabels[1].textContent = lang.stat2;
             statLabels[2].textContent = lang.stat3;
             statLabels[3].textContent = lang.stat4;
+            
+            // 更新首页游戏卡片
+            const lockeCard = document.querySelector('.game-card.locke');
+            if (lockeCard) {
+                lockeCard.querySelector('.game-title').textContent = lang.gameLocke;
+                lockeCard.querySelector('.game-badge').textContent = lang.gameLockeBadge;
+                lockeCard.querySelectorAll('.section-title')[0].innerHTML = '<span class="icon">📰</span> ' + lang.latestNews;
+                lockeCard.querySelectorAll('.section-title')[1].innerHTML = '<span class="icon">💬</span> ' + lang.ugcSection;
+            }
+            
+            const palCard = document.querySelector('.game-card.palworld');
+            if (palCard) {
+                palCard.querySelector('.game-title').textContent = lang.gamePalworld;
+                palCard.querySelector('.game-badge').textContent = lang.competitorBadge;
+                palCard.querySelector('.section-title').innerHTML = '<span class="icon">📰</span> ' + lang.latestNews;
+            }
+            
+            const pokeCard = document.querySelector('.game-card.pokemon');
+            if (pokeCard) {
+                pokeCard.querySelector('.game-title').textContent = lang.gamePokemon;
+                pokeCard.querySelector('.game-badge').textContent = lang.competitorBadge;
+                pokeCard.querySelector('.section-title').innerHTML = '<span class="icon">📰</span> ' + lang.latestNews;
+            }
+            
+            // 更新首页洛克王国新闻列表
+            const homeNewsTitles = document.querySelectorAll('.game-card.locke .news-list .news-title');
+            const homeNewsTexts = [lang.homeNews1, lang.homeNews2, lang.homeNews3, lang.homeNews4];
+            homeNewsTitles.forEach((el, i) => {
+                if (homeNewsTexts[i]) {
+                    const hotTag = el.querySelector('.hot-tag');
+                    if (hotTag) {
+                        el.textContent = homeNewsTexts[i];
+                        const span = document.createElement('span');
+                        span.className = 'hot-tag';
+                        span.textContent = 'HOT';
+                        el.appendChild(span);
+                    } else {
+                        el.textContent = homeNewsTexts[i];
+                    }
+                }
+            });
+            
+            // 更新首页UGC列表
+            const homeUgcTitles = document.querySelectorAll('.game-card.locke .ugc-list .ugc-title');
+            const homeUgcTexts = [lang.homeUgc1, lang.homeUgc2, lang.homeUgc3];
+            homeUgcTitles.forEach((el, i) => {
+                if (homeUgcTexts[i]) el.textContent = homeUgcTexts[i];
+            });
+            
+            // 更新首页小红书标签
+            document.querySelectorAll('.xiaohongshu-tag').forEach(el => {
+                el.textContent = lang.xiaohongshuTag;
+            });
+            
+            // 更新幻兽帕鲁首页新闻
+            const palNewsTitles = document.querySelectorAll('.game-card.palworld .news-list .news-title');
+            const palNewsTexts = [lang.palNews1, lang.palNews2];
+            palNewsTitles.forEach((el, i) => {
+                if (palNewsTexts[i]) el.textContent = palNewsTexts[i];
+            });
+            
+            // 更新宝可梦首页新闻
+            const pokeNewsTitles = document.querySelectorAll('.game-card.pokemon .news-list .news-title');
+            const pokeNewsTexts = [lang.pokeNews1, lang.pokeNews2];
+            pokeNewsTitles.forEach((el, i) => {
+                if (pokeNewsTexts[i]) el.textContent = pokeNewsTexts[i];
+            });
             
             // 更新新闻卡片
             const newsCards = document.querySelectorAll('#news .content-card');
