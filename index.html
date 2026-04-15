@@ -25,6 +25,21 @@
             z-index: 1000;
             border: 1px solid rgba(255,255,255,0.2);
         }
+        .lang-switch {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #fff;
+            z-index: 1000;
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .lang-switch:hover { background: rgba(255,255,255,0.1); }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; padding-top: 60px; }
         .header {
             text-align: center;
@@ -288,6 +303,7 @@
 </head>
 <body>
     <div class="logo-badge">🚀 smo104group18</div>
+    <div class="lang-switch" onclick="toggleLanguage()">🌐 EN</div>
     
     <div class="container">
         <div class="header">
@@ -565,6 +581,66 @@
                 const text = item.textContent.toLowerCase();
                 item.style.display = text.includes(keyword) ? '' : 'none';
             });
+        }
+        
+        // 语言切换
+        let currentLang = 'zh';
+        const translations = {
+            'zh': {
+                title: '🎮 游戏竞品追踪看板',
+                home: '🏠 首页',
+                news: '📰 新闻',
+                guide: '📖 攻略',
+                ugc: '💬 UGC',
+                search: '🔍 搜索内容...',
+                updateTime: '更新时间：2026-04-15 11:56 | 每日自动更新',
+                newsTitle: '📰 洛克王国世界 - 新闻资讯',
+                guideTitle: '📖 洛克王国世界 - 攻略内容',
+                ugcTitle: '💬 洛克王国世界 - UGC内容',
+                filterAll: '全部',
+                filterGuide: '攻略',
+                filterPoster: '海报',
+                filterSprite: '精灵',
+                footer: '数据来源：小红书真实采集、新浪微博、抖音精选、TapTap、17173、游侠网等 | 每日自动更新'
+            },
+            'en': {
+                title: '🎮 Game Tracker Dashboard',
+                home: '🏠 Home',
+                news: '📰 News',
+                guide: '📖 Guide',
+                ugc: '💬 UGC',
+                search: '🔍 Search...',
+                updateTime: 'Updated: 2026-04-15 11:56 | Daily Auto Update',
+                newsTitle: '📰 Rock Kingdom World - News',
+                guideTitle: '📖 Rock Kingdom World - Guide',
+                ugcTitle: '💬 Rock Kingdom World - UGC',
+                filterAll: 'All',
+                filterGuide: 'Guide',
+                filterPoster: 'Poster',
+                filterSprite: 'Sprite',
+                footer: 'Data Source: Xiaohongshu, Weibo, Douyin, TapTap, 17173, etc | Daily Update'
+            }
+        };
+        
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            const lang = translations[currentLang];
+            
+            document.querySelector('.header h1').textContent = lang.title;
+            document.querySelectorAll('.tab-btn')[0].textContent = lang.home;
+            document.querySelectorAll('.tab-btn')[1].textContent = lang.news;
+            document.querySelectorAll('.tab-btn')[2].textContent = lang.guide;
+            document.querySelectorAll('.tab-btn')[3].textContent = lang.ugc;
+            document.getElementById('searchInput').placeholder = lang.search;
+            document.querySelector('.update-time').textContent = lang.updateTime;
+            document.querySelector('.lang-switch').textContent = currentLang === 'zh' ? '🌐 EN' : '🌐 中文';
+            
+            // 更新页面标题
+            if (currentLang === 'en') {
+                document.querySelector('#news h2').textContent = lang.newsTitle;
+                document.querySelector('#guide h2').textContent = lang.guideTitle;
+                document.querySelector('#ugc h2').textContent = lang.ugcTitle;
+            }
         }
     </script>
 </body>
